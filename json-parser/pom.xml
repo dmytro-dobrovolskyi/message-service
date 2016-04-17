@@ -8,5 +8,12 @@
     <artifactId>json-parser</artifactId>
     <version>0.1</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.ddobrovolskyi</groupId>
+            <artifactId>parser</artifactId>
+            <version>0.1</version>
+        </dependency>
+    </dependencies>
 
 </project>

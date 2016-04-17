@@ -21,7 +21,6 @@
     </properties>
 
     <modules>
-        <module>parser</module>
         <module>server</module>
     </modules>
 </project>

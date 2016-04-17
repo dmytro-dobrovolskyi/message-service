@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "parser")
-public class ApplicationProperties {
+public class ParserProperties {
 
     @Valid
     @NotNull
