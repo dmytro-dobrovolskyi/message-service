@@ -1,7 +1,7 @@
 package com.ddobrovolskyi.parser;
 
 /**
- * Generic converter interface for converting raw String data to its Java representation.
+ * Generic interface for converting raw String data to its Java representation.
  */
 public interface Parser {
 
