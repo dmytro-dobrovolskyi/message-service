@@ -3,7 +3,8 @@ package com.ddobrovolskyi.parser;
 /**
  * Generic interface for converting raw String data to its Java representation.
  */
-public interface Parser {
+public interface
+Parser {
 
     /**
      * Converts raw String data to its Java representation.
@@ -20,7 +21,7 @@ public interface Parser {
      *
      * @param content raw String representation
      * @return {@literal true} if {@literal content} can be converted to its Java representation,
-     * false if not
+     * {@literal false} if not
      */
     boolean canParse(String content);
 }

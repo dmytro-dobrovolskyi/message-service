@@ -4,7 +4,7 @@ import com.ddobrovolskyi.messageservice.exception.DataTypeNotSupportedException;
 import com.ddobrovolskyi.messageservice.util.Loggable;
 
 /**
- * Service for message logging in a single format.
+ * Service for single format message logging.
  */
 public interface MessageLoggingService extends Loggable {
     /**

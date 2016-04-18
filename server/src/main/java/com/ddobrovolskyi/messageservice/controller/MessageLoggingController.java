@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller for handling certain message logging.
+ * Controller for handling certain message logging requests.
  */
 @RestController
 public class MessageLoggingController {
@@ -23,7 +23,7 @@ public class MessageLoggingController {
      * Logs {@link Audit} type message.
      *
      * @param message raw String representation of {@code Audit} instance.
-     * @return response with HTTP code and corresponding message
+     * @return response with HTTP code and corresponding details message
      */
     @RequestMapping(value = "/audit", method = RequestMethod.POST)
     ResponseEntity<String> logAuditMessage(@RequestBody String message) {
