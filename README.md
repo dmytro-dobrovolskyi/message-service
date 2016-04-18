@@ -2,8 +2,8 @@ Service for logging incoming messages.
 
 To run the application:
     Run the following commands from project root dir
-        1)  `mvn clean install` from project root dir
-        2) Run `mvn -pl server spring-boot:run`
+        1.  `mvn clean install` from project root dir
+        2. Run `mvn -pl server spring-boot:run`
         
 To test message logging funtionality, make the following HTTP request:
 
