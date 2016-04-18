@@ -4,7 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ddobrovolskyi</groupId>
+    <parent>
+        <groupId>com.ddobrovolskyi</groupId>
+        <artifactId>message-service</artifactId>
+        <version>0.1</version>
+    </parent>
+
     <artifactId>parser</artifactId>
     <version>0.1</version>
 </project>

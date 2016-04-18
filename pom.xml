@@ -18,9 +18,42 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <application.name>message-service</application.name>
     </properties>
 
     <modules>
+        <module>parser</module>
         <module>server</module>
+        <module>json-parser</module>
+        <module>xml-parser</module>
+        <module>csv-parser</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.2</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.ddobrovolskyi.messageservice.Application</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
