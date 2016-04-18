@@ -21,8 +21,9 @@ public abstract class DefaultMessageLoggingService implements MessageLoggingServ
                 .findFirst()
                 .orElseThrow(DataTypeNotSupportedException::new);
 
-        logger().info("=======================================");
         String processedMessage = messageParser.parse(message, messageType).toString();
+
+        logger().info("=======================================");
         logger().info(processedMessage);
         logger().info("=======================================");
         logger().info(String.format("Processed messages: %d    Total length: %d",
@@ -32,5 +33,10 @@ public abstract class DefaultMessageLoggingService implements MessageLoggingServ
         logger().info("=======================================");
     }
 
+    /**
+     * Gets certain {@code Parser} implementations which are necessary for message conversion.
+     *
+     * @return certain {@code Parser} implementations
+     */
     protected abstract List<? extends Parser> getParsers();
 }

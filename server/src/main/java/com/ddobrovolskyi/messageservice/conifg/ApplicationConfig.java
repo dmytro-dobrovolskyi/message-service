@@ -17,7 +17,6 @@ public class ApplicationConfig {
     @Autowired
     private ParserLoader parserLoader;
 
-
     ApplicationConfig() {
 
     }

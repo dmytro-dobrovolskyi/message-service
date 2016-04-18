@@ -29,6 +29,9 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Class for loading {@code Parser} implementations.
+ */
 @Component
 public class ParserLoader implements Loggable {
     private static final String JAR_EXT = ".jar";
@@ -51,6 +54,12 @@ public class ParserLoader implements Loggable {
         loadParsers();
     }
 
+    /**
+     * Loads and instantiates all {@code Parser} implementations which are present in
+     * {@code parserProperties#getClasspath} directory.
+     *
+     * @return list of certain {@code Parser} implementations
+     */
     @SneakyThrows(IOException.class)
     public List<? extends Parser> loadParsers() {
         try (Stream<Path> parserDir = Files.list(Paths.get(parserProperties.getClasspath()))) {
@@ -89,6 +98,11 @@ public class ParserLoader implements Loggable {
                 .map(this::instantiateParser);
     }
 
+    /**
+     * Recursively loads nested jar dependencies in case of fat jars.
+     *
+     * @param jar jar which dependencies will be loaded to the memory
+     */
     @SneakyThrows(IOException.class)
     private void loadDependencies(File jar) {
         JarFile jarFile = new JarFile(jar);
@@ -100,7 +114,7 @@ public class ParserLoader implements Loggable {
                 .forEach(this::loadDependencies);
     }
 
-    @SneakyThrows({IOException.class})
+    @SneakyThrows(IOException.class)
     private File createFileFromDependencyJar(JarFile parentJar, JarEntry dependencyJar) {
         File tempFile = File.createTempFile(TMP_FILE_PREFIX, TMP_FILE_SUFFIX);
         tempFile.deleteOnExit();
