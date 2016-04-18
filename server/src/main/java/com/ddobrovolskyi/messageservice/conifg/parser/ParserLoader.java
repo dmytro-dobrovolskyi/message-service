@@ -1,6 +1,7 @@
 package com.ddobrovolskyi.messageservice.conifg.parser;
 
 import com.ddobrovolskyi.messageservice.conifg.ParserProperties;
+import com.ddobrovolskyi.messageservice.util.Loggable;
 import com.ddobrovolskyi.parser.Parser;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,10 +30,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class ParserLoader {
+public class ParserLoader implements Loggable {
     private static final String JAR_EXT = ".jar";
     private static final String CLASS_EXT = ".class";
-    private static final String TMP_FILE_PREFIX = "stream2file";
+    private static final String TMP_FILE_PREFIX = "parser-dependency-";
     private static final String TMP_FILE_SUFFIX = ".tmp";
 
     @Autowired
@@ -42,6 +44,11 @@ public class ParserLoader {
 
     ParserLoader() {
 
+    }
+
+    @PostConstruct
+    private void loadOnStartup() {
+        loadParsers();
     }
 
     @SneakyThrows(IOException.class)
@@ -67,54 +74,57 @@ public class ParserLoader {
         };
     }
 
+    @SneakyThrows(IOException.class)
     private Stream<? extends Parser> loadParsersFromJar(File jar) {
-        return loadDependencies(jar)
+        logger().info("Loading " + jar);
+        loadDependencies(jar);
+
+        return new JarFile(jar)
                 .stream()
-                .filter(jarEntry -> jarEntry.getName().endsWith(CLASS_EXT))
                 .map(JarEntry::getName)
-                .map(className -> StringUtils.substringBefore(className, CLASS_EXT))
+                .filter(jarEntryName -> jarEntryName.endsWith(CLASS_EXT))
                 .map(this::normalizeClassName)
                 .map(className -> loadClassByName(className, jar))
                 .filter(Parser.class::isAssignableFrom)
-                .map(this::instantiate);
+                .map(this::instantiateParser);
     }
 
     @SneakyThrows(IOException.class)
-    private JarFile loadDependencies(File jar) {
+    private void loadDependencies(File jar) {
         JarFile jarFile = new JarFile(jar);
 
-        jarFile.stream()
+        jarFile.stream().parallel()
                 .filter(jarEntry -> jarEntry.getName().endsWith(JAR_EXT))
                 .map(dependencyJar -> createFileFromDependencyJar(jarFile, dependencyJar))
                 .peek(this::loadJar)
-                .peek(this::loadDependencies)
-                .forEach(File::delete);
-
-        return jarFile;
+                .forEach(this::loadDependencies);
     }
 
     @SneakyThrows({IOException.class})
     private File createFileFromDependencyJar(JarFile parentJar, JarEntry dependencyJar) {
         File tempFile = File.createTempFile(TMP_FILE_PREFIX, TMP_FILE_SUFFIX);
-
+        tempFile.deleteOnExit();
         try (InputStream in = parentJar.getInputStream(dependencyJar);
              FileOutputStream out = new FileOutputStream(tempFile)
         ) {
             IOUtils.copy(in, out);
+            logger().debug(dependencyJar + ": " + tempFile.toString());
             return tempFile;
         }
     }
 
     @SneakyThrows(MalformedURLException.class)
     private void loadJar(File jar) {
-        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        ClassLoader classLoader = getClass().getClassLoader();
         Method addURLMethod = ReflectionUtils.findMethod(URLClassLoader.class, "addURL", URL.class);
         addURLMethod.setAccessible(true);
-        ReflectionUtils.invokeMethod(addURLMethod, urlClassLoader, jar.toURI().toURL());
+        ReflectionUtils.invokeMethod(addURLMethod, classLoader, jar.toURI().toURL());
+
+        logger().debug(jar + " loaded");
     }
 
-    private String normalizeClassName(String pathToClass) {
-        return pathToClass.replace('/', '.');
+    private String normalizeClassName(String className) {
+        return StringUtils.substringBefore(className, CLASS_EXT).replace('/', '.');
     }
 
     @SneakyThrows({MalformedURLException.class, ClassNotFoundException.class})
@@ -127,8 +137,10 @@ public class ParserLoader {
     }
 
     @SneakyThrows({IllegalAccessException.class, InstantiationException.class, NoSuchMethodException.class})
-    private Parser instantiate(Class<?> clazz) {
+    private Parser instantiateParser(Class<?> clazz) {
         ReflectionUtils.makeAccessible(clazz.getDeclaredConstructor());
-        return ((Parser) clazz.newInstance());
+        Parser parser = (Parser) clazz.newInstance();
+        logger().info(clazz + " instantiated");
+        return parser;
     }
 }

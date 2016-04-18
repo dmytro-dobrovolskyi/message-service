@@ -7,18 +7,29 @@ import com.ddobrovolskyi.parser.Parser;
 import java.util.List;
 
 public abstract class DefaultMessageLoggingService implements MessageLoggingService {
+    private long messageCount;
+    private long totalLength;
+
     protected DefaultMessageLoggingService() {
 
     }
 
     @Override
-    public <T> void logMessage(String message) {
+    public void logMessage(String message, Class<?> messageType) {
         Parser messageParser = getParsers().stream()
                 .filter(parser -> parser.canParse(message))
                 .findFirst()
                 .orElseThrow(DataTypeNotSupportedException::new);
 
-        logger().info(messageParser.parse(message).toString());
+        logger().info("=======================================");
+        String processedMessage = messageParser.parse(message, messageType).toString();
+        logger().info(processedMessage);
+        logger().info("=======================================");
+        logger().info(String.format("Processed messages: %d    Total length: %d",
+                ++messageCount,
+                totalLength += processedMessage.length()
+        ));
+        logger().info("=======================================");
     }
 
     protected abstract List<? extends Parser> getParsers();
