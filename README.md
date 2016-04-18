@@ -2,9 +2,9 @@
 
 To run the application:
 
-    Run the following commands from project root dir
+    Run the following commands from the project root dir
     
-        1) mvn clean install from project root dir
+        1) mvn clean install
         2) mvn -pl server spring-boot:run
         
 To test message logging funtionality, make the following HTTP request:
